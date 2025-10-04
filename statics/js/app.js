@@ -9,32 +9,40 @@ const navLinks = document.querySelectorAll('.nav-link');
 const scrollTopBtn = document.getElementById('scrollTop');
 
 // Toggle mobile menu
-hamburger.addEventListener('click', () => {
-    hamburger.classList.toggle('active');
-    navMenu.classList.toggle('active');
-});
+if (hamburger && navMenu) {
+    hamburger.addEventListener('click', () => {
+        hamburger.classList.toggle('active');
+        navMenu.classList.toggle('active');
+    });
+}
 
 // Close mobile menu when clicking on a link
 navLinks.forEach(link => {
     link.addEventListener('click', () => {
-        hamburger.classList.remove('active');
-        navMenu.classList.remove('active');
+        if (hamburger && navMenu) {
+            hamburger.classList.remove('active');
+            navMenu.classList.remove('active');
+        }
     });
 });
 
 // Navbar scroll effect
 window.addEventListener('scroll', () => {
-    if (window.scrollY > 100) {
-        navbar.classList.add('scrolled');
-    } else {
-        navbar.classList.remove('scrolled');
+    if (navbar) {
+        if (window.scrollY > 100) {
+            navbar.classList.add('scrolled');
+        } else {
+            navbar.classList.remove('scrolled');
+        }
     }
 
     // Show/hide scroll to top button
-    if (window.scrollY > 300) {
-        scrollTopBtn.classList.add('visible');
-    } else {
-        scrollTopBtn.classList.remove('visible');
+    if (scrollTopBtn) {
+        if (window.scrollY > 300) {
+            scrollTopBtn.classList.add('visible');
+        } else {
+            scrollTopBtn.classList.remove('visible');
+        }
     }
 });
 
@@ -60,29 +68,36 @@ window.addEventListener('scroll', () => {
     });
 });
 
-// Smooth scroll for anchor links
+// Smooth scroll for anchor links (only on same page)
 navLinks.forEach(link => {
     link.addEventListener('click', (e) => {
-        e.preventDefault();
-        const targetId = link.getAttribute('href');
-        const targetSection = document.querySelector(targetId);
+        const href = link.getAttribute('href');
 
-        if (targetSection) {
-            window.scrollTo({
-                top: targetSection.offsetTop - 70,
-                behavior: 'smooth'
-            });
+        // Only apply smooth scroll if it's an anchor link (starts with #)
+        if (href && href.startsWith('#')) {
+            e.preventDefault();
+            const targetSection = document.querySelector(href);
+
+            if (targetSection) {
+                window.scrollTo({
+                    top: targetSection.offsetTop - 70,
+                    behavior: 'smooth'
+                });
+            }
         }
+        // For regular links (other pages), let default behavior work
     });
 });
 
 // Scroll to top
-scrollTopBtn.addEventListener('click', () => {
-    window.scrollTo({
-        top: 0,
-        behavior: 'smooth'
+if (scrollTopBtn) {
+    scrollTopBtn.addEventListener('click', () => {
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
     });
-});
+}
 
 // ===================================
 // SCROLL ANIMATIONS
@@ -318,6 +333,70 @@ if ('IntersectionObserver' in window) {
 
     document.querySelectorAll('img[data-src]').forEach(img => {
         imageObserver.observe(img);
+    });
+}
+
+// ===================================
+// FAQ TOGGLE
+// ===================================
+
+document.addEventListener('DOMContentLoaded', () => {
+    const faqItems = document.querySelectorAll('.faq-item');
+
+    faqItems.forEach(item => {
+        const question = item.querySelector('.faq-question');
+
+        question.addEventListener('click', () => {
+            // Close other items
+            faqItems.forEach(otherItem => {
+                if (otherItem !== item) {
+                    otherItem.classList.remove('active');
+                }
+            });
+
+            // Toggle current item
+            item.classList.toggle('active');
+        });
+    });
+});
+
+// ===================================
+// STATS COUNTER ANIMATION
+// ===================================
+
+document.addEventListener('DOMContentLoaded', () => {
+    const statNumbers = document.querySelectorAll('.stat-number');
+
+    const observerStats = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const target = entry.target;
+                const targetValue = parseInt(target.getAttribute('data-target'));
+
+                animateCounter(target, targetValue);
+                observerStats.unobserve(target);
+            }
+        });
+    });
+
+    statNumbers.forEach(stat => {
+        observerStats.observe(stat);
+    });
+});
+
+// ===================================
+// NEWSLETTER FORM
+// ===================================
+
+const newsletterForm = document.querySelector('.newsletter-form');
+if (newsletterForm) {
+    newsletterForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const email = newsletterForm.querySelector('input[type="email"]').value;
+
+        // Here you would typically send to a server
+        alert(`Merci de votre inscription avec l'email: ${email}`);
+        newsletterForm.reset();
     });
 }
 
